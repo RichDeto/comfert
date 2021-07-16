@@ -1,6 +1,8 @@
 This repository contains the data and R code needed to reproduce the results in:
+
 "Demographic Models of the Reproductive Process: Past, Interlude, and Future" 
 Ciganda, D. & Todd, N. (2021) Population Studies
+
 
 The file `main_local.R` in the `local` directory allows to runs the estimation algorithm in a "local"
 computing cluster (a small cluster without a job scheduler).
