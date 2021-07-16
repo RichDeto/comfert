@@ -5,7 +5,7 @@ Ciganda, D. & Todd, N. (2021) Population Studies
 
 
 The file `main_local.R` in the `local` directory allows to runs the estimation algorithm in a "local"
-computing cluster (a small cluster without a job scheduler).
+computing cluster (without a job scheduler).
 
 The file `main_remote.R` in the `remote` directory manages the computation in a remote (external) cluster running on Slurm.
 
