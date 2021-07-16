@@ -1,6 +1,6 @@
 This repository contains the data and R code needed to reproduce the results in:
 
-"Demographic Models of the Reproductive Process: Past, Interlude, and Future" 
+"Demographic Models of the Reproductive Process: Past, Interlude, and Future" \\
 Ciganda, D. & Todd, N. (2021) Population Studies
 
 
