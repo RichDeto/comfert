@@ -1,7 +1,7 @@
 This repository contains the data and R code needed to reproduce the results in:
 
-"Demographic Models of the Reproductive Process: Past, Interlude, and Future" <br />
-Ciganda, D. & Todd, N. (2021) Population Studies.
+<br />
+Ciganda, D. & Todd, N. (2021) "Demographic Models of the Reproductive Process: Past, Interlude, and Future". Population Studies.
 <https://doi.org/10.1080/00324728.2021.1959943>
 
 <br />
@@ -12,5 +12,8 @@ computing cluster (without a job scheduler).
 <br />
 
 The file `main_remote.R` in the `remote` directory manages the computation in a remote (external) cluster running on Slurm.
+
+<br />
+
 
 The file with the model itself `comfert.R` can be found in the `run` directory. 
