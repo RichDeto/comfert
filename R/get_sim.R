@@ -1,22 +1,37 @@
-
-# get simulated rates
-get_sim <- function(res_dir, iniY, endY, nsim, obs, 
+#' This function allows you to get simulated rates
+#' @param res_dir directory where the process leave the results.
+#' @param iniY initial year
+#' @param endY end year
+#' @param nsim number of simulations
+#' @param obs .
+#' @param asfr . Default T
+#' @param unplanned . Default T
+#' @param unwanted . Default T
+#' @param desired . Default T
+#' @param ccf_edu . Default F
+#' @param all_sim . Default F
+#' @keywords process
+#' @return rds
+#' @family estimate
+#' @examples
+#' .
+get_sim <- function(res_dir, iniY, endY, nsim, obs,
                     asfr = T, unplanned = F, unwanted = F,
                     desired = F, ccf_edu = F, all_sim = F){
-  
-  get_sim_results <- function(res_dir, iniY, endY, obs){ 
-    
+
+  get_sim_results <- function(res_dir, iniY, endY, obs){
+
     res_list <- lapply(res_dir, function(x) {list.files(x, "RData", full.names = TRUE)})
     empty <- which(sapply(res_list, length)!= nsim)
-    
+
     if(length(empty)>0){
-      cat(paste("No results for combination(s)"), as.vector(empty), 
+      cat(paste("No results for combination(s)"), as.vector(empty),
           "\n removing directory from list..")
       res_dir <- res_dir[-as.numeric(empty)]
-    } 
-    
+    }
+
     res_names <- sapply(res_dir, function(x) {list.files(x, "RData", full.names = TRUE)})
-    
+
     if(class(obs) == "matrix"){
       obs_rnames <- rownames(obs)
       obs_cnames <- colnames(obs)
@@ -24,35 +39,35 @@ get_sim <- function(res_dir, iniY, endY, nsim, obs,
       obs_rnames <- rownames(obs$obs_asfr)
       obs_cnames <- colnames(obs$obs_asfr)
     }
-    
+
     # asfr
     asfr <- sapply(res_names, function(x) readRDS(x)["asfrt"])
     names(asfr) <- rep("asfr", length(asfr))
-    
+
     sim_asfr_0 <- lapply(asfr,
                          function(x){colnames(x) <- paste0("age", 14:50);
                          x <- x[-1,];
                          x <- x[1:length(iniY:(endY-1)),];
                          rownames(x) <- iniY:(endY-1);
                          return(as.matrix(x))})
-    
-    
+
+
     sim_asfr <- lapply(sim_asfr_0,
                        function(x){x[rownames(x) %in% obs_rnames,
                                      colnames(x) %in% obs_cnames]})
     sim_data <- list()
     sim_data[["sim_asfr"]] <- sim_asfr
-    
+
     # unplanned births
     if(unplanned){
       if(length(obs$obs_unplanned)>0){
-        c_names <- colnames(obs$obs_unplanned) 
+        c_names <- colnames(obs$obs_unplanned)
       }else{
-        c_names <- "proportion.unplanned"  
+        c_names <- "proportion.unplanned"
       }
         unp <- sapply(res_names, function(x) readRDS(x)["ppBirths"])
         names(unp) <- rep("un", length(unp))
-        
+
         sim_unp_0 <- lapply(unp,
                             function(x) {prop <- (x[,1] - x[,2]) / x[,1];
                             return(as.matrix(prop))})
@@ -61,13 +76,13 @@ get_sim <- function(res_dir, iniY, endY, nsim, obs,
                           colnames(x) <- c_names;
                           rownames(x) <- iniY:(endY-1);
                           return(as.matrix(x))})
-        
+
         if(all_sim){
-          
+
           sim_unplanned <- sim_unp
-          
+
         }else{
-          
+
           sim_unplanned <- lapply(sim_unp,
                                   function(x){x <- x[rownames(x) %in% rownames(obs$obs_unplanned),
                                                      colnames(x) %in% colnames(obs$obs_unplanned)];
@@ -75,15 +90,15 @@ get_sim <- function(res_dir, iniY, endY, nsim, obs,
                                   colnames(x) <- colnames(obs$obs_unplanned);
                                   return(x)})
         }
-        
+
         sim_data[["sim_unplanned"]] <- sim_unplanned
     }
     # unwanted
     if(unwanted){
       if(length(obs$obs_unwanted)>0){
-        c_names <- colnames(obs$obs_unwanted) 
+        c_names <- colnames(obs$obs_unwanted)
       }else{
-        c_names <- "prop.unwanted"  
+        c_names <- "prop.unwanted"
       }
         sim_unw_0 <- lapply(unp,
                             function(x) {prop <- (x[,1] - x[,3]) / x[,1];
@@ -94,9 +109,9 @@ get_sim <- function(res_dir, iniY, endY, nsim, obs,
                           rownames(x) <- iniY:(endY-1);
                           return(as.matrix(x))})
         if(all_sim){
-          
+
           sim_unwanted <- sim_unw
-          
+
         }else{
           sim_unwanted <- lapply(sim_unw,
                                  function(x){x <- x[rownames(x) %in% rownames(obs$obs_unwanted),
@@ -105,32 +120,32 @@ get_sim <- function(res_dir, iniY, endY, nsim, obs,
                                  colnames(x) <- colnames(obs$obs_unwanted);
                                  return(x)})
         }
-        
+
         sim_data[["sim_unwanted"]] <- sim_unwanted
-        
+
     }
     #desired
     if(desired){
       if(length(obs$obs_desired)>0){
-        c_names <- colnames(obs$obs_desired) 
+        c_names <- colnames(obs$obs_desired)
       }else{
-        c_names <- "d"  
+        c_names <- "d"
       }
         dKids <- sapply(res_names, function(x) readRDS(x)["dKids_all"])
-      
+
         names(dKids) <- rep("desired", length(dKids))
-        
+
         sim_dkids_0 <- lapply(dKids, as.matrix)
         sim_dkids <- lapply(sim_dkids_0,
                             function(x){x <- as.matrix(x[1:length(iniY:(endY-1)),]);
                             colnames(x) <- colnames(obs$obs_desired);
                             rownames(x) <- iniY:(endY-1);
                             return(as.matrix(x))})
-        
+
         if(all_sim){
-          
+
           sim_desired <- sim_dkids
-          
+
         }else{
           sim_desired <- lapply(sim_dkids,
                                 function(x){x <- x[rownames(x) %in% rownames(obs$obs_desired),
@@ -139,7 +154,7 @@ get_sim <- function(res_dir, iniY, endY, nsim, obs,
                                 colnames(x) <- colnames(obs$obs_desired);
                                 return(x)})
         }
-        
+
         sim_data[["sim_desired"]] <- sim_desired
     }
     # ccf by education
@@ -150,9 +165,9 @@ get_sim <- function(res_dir, iniY, endY, nsim, obs,
       sim_cohort_edu <- list()
       for(i in 1:3){
       ccf_edu[[i]] <- sapply(res_names, function(x) readRDS(x)[paste0("cohort",i)])
-      
+
       names(ccf_edu[[i]]) <- rep(paste0("ccf_edu",i), length(ccf_edu[[i]]))
-      
+
       ccf_edu_0 <- lapply(ccf_edu[[i]], as.matrix)
       sim_cohort_edu[[i]] <- lapply(ccf_edu_0,
                           function(x){j <- as.matrix(x[1:length(iniY:(endY-51)),2]);
@@ -167,9 +182,9 @@ get_sim <- function(res_dir, iniY, endY, nsim, obs,
                                   sim_cohort_edu[[3]][[i]])
       }
       if(all_sim){
-        
+
         sim_ccf_edu <- sim_cohort_edu_r
-        
+
       }else{
         sim_ccf_edu <- lapply(sim_cohort_edu_r,
                               function(x){x <- x[rownames(x) %in% rownames(obs$obs_ccf_edu),
@@ -181,17 +196,17 @@ get_sim <- function(res_dir, iniY, endY, nsim, obs,
       }
       sim_data[["sim_ccf_edu"]] <- sim_ccf_edu
     }
-    
+
     # results
     return(sim_data)
   }
-  
+
   if (length(res_dir)>1){
     nsim_sim_results <- lapply(res_dir, get_sim_results, iniY, endY, obs)
   }else{
     nsim_sim_results <- get_sim_results(res_dir, iniY, endY, obs)
   }
-  
+
   return(nsim_sim_results)
-  
+
 }

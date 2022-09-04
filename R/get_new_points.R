@@ -1,3 +1,14 @@
+#' This function allows you to get new points
+#' @param priors value of priors.
+#' @param country .
+#' @param n .
+#' @keywords process
+#' @return data.frame
+#' @export
+#' @import lhs
+#' @family estimate
+#' @examples
+#' .
 get_new_points <- function(priors, country, n){
 
 locations <- priors[1, ]
