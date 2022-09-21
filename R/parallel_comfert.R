@@ -8,6 +8,7 @@
 #' @return data.frame
 #' @export
 #' @import lhs
+#' @import parallel
 #' @family estimate
 #' @examples
 #' .
