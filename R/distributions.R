@@ -137,7 +137,7 @@ get_edu_dist <- function(input, fore = c(1870:2050), save = T){
 #' @family inputs
 #' @examples
 #' .
-get_work_dist <- function(input, fore = c(1880:2050), max_obs_cohort = 1971, save = T){
+get_work_dist <- function(input, fore = c(1915:2020), max_obs_cohort = 1971, save = T){
   # read in files
   raw_edw <- input[2:4]
 
@@ -172,8 +172,8 @@ get_work_dist <- function(input, fore = c(1880:2050), max_obs_cohort = 1971, sav
 
 
   # smooth & forecast
-  cohorts_smt <- 1932:max_obs_cohort
-  cohorts_obs <- 1932:max_obs_cohort
+  cohorts_smt <- min(fore):max_obs_cohort
+  cohorts_obs <- min(fore):max_obs_cohort
   cohorts_fct <- fore
 
   p_active <- smooth.spline(df_primary[df_primary$cohort %in% cohorts_smt, 1], spar = 0.8)
@@ -277,8 +277,6 @@ cum_edu_dist <- function(save){
   write.table(edu_dist, file = file.path(dir, "cum_edu_dist"))
   return(cum_edu_dist)
 }
-
-
 cum_edu_work_dist <- function(save){
   dir <- file.path("data/distributions")
   edu_work_dist <- read.csv(file.path(dir, "edu_work_dist.csv"), sep = " ")
@@ -291,8 +289,6 @@ cum_edu_work_dist <- function(save){
   write.table(dist, file = file.path(dir, "cum_work_dist"))
   return(dist)
 }
-
-
 
 # plots
 every_nth <- function(x, nth, empty = TRUE, inverse = FALSE) {
@@ -551,7 +547,7 @@ plot_dist_work <- function(dat, x1, x2,y1 = 0 ,y2 = 1, lp, active_only = F, save
 }
 
 ########################################################################
-# ed <- get_edu_dist(fore = c(1900:2080),max_obs_cohort = 1977, save = T)
+# ed <- get_edu_dist(input_uy, fore = c(1900:2080),max_obs_cohort = 1977, save = F)
 # ced <- cum_edu_dist(save = T)
 # wd <- get_work_dist(fore = c(1900:2080),max_obs_cohort = 1979, save = T)
 # cum_edu_work_dist(save = T)
